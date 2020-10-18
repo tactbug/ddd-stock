@@ -1,0 +1,36 @@
+server:
+  port: 10001
+spring:
+  application:
+    name: stock
+  datasource:
+    url: ${MYSQL:jdbc:mysql://192.168.137.101:3306/ddd?allowPublicKeyRetrieval=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${JPA_USERNAME:root}
+    password: ${JPA_PASSWORD:900922}
+  jpa:
+    hibernate:
+      ddl-auto: update
+  kafka:
+    bootstrap-servers: ${KAFKA:192.168.137.101:9092}
+    producer:
+      retries: 0
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: stock
+
+center: ${CENTER:1}
+machine: ${MACHINE:1}
+seller:
+  warehouse: ${SELLER_WAREHOUSE:100}
+topic:
+  warehouse:
+    event: ${WAREHOUSE_EVENT:warehouse_event}
+  goods:
+    event: ${GOODS_EVENT:goods_event}
+    command:
+      command: ${GOODS_COMMAND:goods_command}
+      callBack: ${GOODS_COMMAND_CALLBACK:goods_command_callBack}
+  seller:
+    event: ${SELLER_EVENT:seller_event}
