@@ -4,7 +4,6 @@ import com.tactbug.ddd.stock.aggregate.root.StockRoot;
 import com.tactbug.ddd.stock.assist.exception.TactStockException;
 import com.tactbug.ddd.stock.assist.message.command.CallBackMessage;
 import com.tactbug.ddd.stock.assist.message.command.goods.ourSellingGoods.OurSellingCallBack;
-import com.tactbug.ddd.stock.assist.message.command.goods.ourSellingGoods.OurSellingCommand;
 import com.tactbug.ddd.stock.assist.message.command.goods.ourSellingGoods.OurSellingItem;
 import lombok.Data;
 import lombok.NoArgsConstructor;

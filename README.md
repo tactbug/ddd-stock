@@ -96,6 +96,9 @@ java -jar stock-1.0-SNAPSHOT.jar -Dxxx
   - service: 系统服务
 ## 版本内容
 ---
+### 1.0.1
+---
+将WarehouseSpecification的验证代码移入聚合内部
 ### 1.0.0
 ---
 单体环境部署下的所有功能开发完成

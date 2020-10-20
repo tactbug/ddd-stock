@@ -53,7 +53,6 @@ public class StockServiceImpl implements StockService {
     @Override
     public void createWarehouse(String name, Integer type) throws IOException {
         Warehouse warehouse = WarehouseFactory.createTopWarehouse(name, type);
-        WarehouseSpecification.checkWarehouse(warehouse);
         EventMessage<WarehouseEventTypeEnum, WarehouseCreated> warehouseCreatedEventMessage = warehouse.warehouseCreated();
         warehouseRepository.putWarehouseIn(warehouse);
         warehouseEventPublisher.warehouseCreatedEvent(warehouseCreatedEventMessage);
@@ -65,7 +64,6 @@ public class StockServiceImpl implements StockService {
         warehouseRepository.assembleChildren(parent);
         Warehouse child = WarehouseFactory.createChild(parent, warehouseType);
         EventMessage<WarehouseEventTypeEnum, ChildAdded> childAddedEventMessage = parent.addChild(child);
-        WarehouseSpecification.checkWarehouse(parent);
         warehouseRepository.putWarehouseIn(child);
         warehouseEventPublisher.childAddEvent(childAddedEventMessage);
     }
@@ -75,7 +73,6 @@ public class StockServiceImpl implements StockService {
         Warehouse warehouse = warehouseRepository.getSimple(warehouseId);
         warehouseRepository.assembleChildren(warehouse);
         EventMessage<WarehouseEventTypeEnum, WarehouseNameUpdated> eventMessage = warehouse.updateName(newName);
-        WarehouseSpecification.checkWarehouse(warehouse);
         warehouseRepository.putWarehouseIn(warehouse);
         warehouseEventPublisher.warehouseNameUpdatedEvent(eventMessage);
     }
@@ -87,7 +84,6 @@ public class StockServiceImpl implements StockService {
         Warehouse parent = warehouseRepository.getSimple(targetId);
         warehouseRepository.assembleChildren(parent);
         EventMessage<WarehouseEventTypeEnum, WarehouseMoved> eventMessage = parent.acceptChild(child);
-        WarehouseSpecification.checkWarehouse(parent);
         warehouseRepository.putWarehouseIn(parent);
         warehouseEventPublisher.warehouseMovedEvent(eventMessage);
     }
@@ -97,7 +93,6 @@ public class StockServiceImpl implements StockService {
         Warehouse warehouse = warehouseRepository.getSimple(warehouseId);
         warehouseRepository.assembleStockList(warehouse);
         EventMessage<WarehouseEventTypeEnum, WarehouseStatusUpdated> eventMessage = warehouse.makeFull();
-        WarehouseSpecification.checkWarehouse(warehouse);
         warehouseRepository.putWarehouseIn(warehouse);
         warehouseEventPublisher.warehouseFullEvent(eventMessage);
     }
@@ -106,7 +101,6 @@ public class StockServiceImpl implements StockService {
     public void deleteWarehouse(Long warehouseId) throws JsonProcessingException {
         Warehouse warehouse = warehouseRepository.getSimple(warehouseId);
         warehouseRepository.assembleChildrenAndStockList(warehouse);
-        WarehouseSpecification.checkWarehouse(warehouse);
 
         WarehouseDeleted warehouseDeleted = new WarehouseDeleted();
         warehouseDeleted.setName(warehouse.getName());
@@ -131,7 +125,6 @@ public class StockServiceImpl implements StockService {
         Warehouse warehouse = warehouseRepository.getSimple(warehouseId);
         warehouseRepository.assembleChildrenAndStockList(warehouse);
         EventMessage<WarehouseEventTypeEnum, WarehouseStatusUpdated> eventMessage = warehouse.makeOff();
-        WarehouseSpecification.checkWarehouse(warehouse);
         warehouseRepository.putWarehouseIn(warehouse);
         warehouseEventPublisher.warehouseOffEvent(eventMessage);
     }
@@ -148,7 +141,6 @@ public class StockServiceImpl implements StockService {
             }
         }
         EventMessage<WarehouseEventTypeEnum, WarehouseStatusUpdated> eventMessage = target.makeActive();
-        WarehouseSpecification.checkWarehouse(target);
         warehouseRepository.putWarehouseIn(target);
         warehouseEventPublisher.warehouseActiveEvent(eventMessage);
     }
@@ -156,15 +148,14 @@ public class StockServiceImpl implements StockService {
     @Override
     public void putStockInByManager(Long goodsId, Long warehouseId, Integer batchNumber, Integer quantity) {
         StockRoot stock = new StockRoot(goodsId, warehouseId, batchNumber, quantity);
+        Goods goods;
         if (goodsRepository.exists(goodsId)){
-            Goods goods = goodsRepository.getById(goodsId);
-            goods.addStock(stock);
-            goodsRepository.putGoodsIn(goods);
+            goods = goodsRepository.getById(goodsId);
         }else {
-            Goods goods = Goods.create(goodsId);
-            goods.addStock(stock);
-            goodsRepository.putGoodsIn(goods);
+            goods = Goods.create(goodsId);
         }
+        goods.addStock(stock);
+        goodsRepository.putGoodsIn(goods);
     }
 
     @Override
@@ -186,7 +177,6 @@ public class StockServiceImpl implements StockService {
         warehouseRepository.assembleChildren(warehouse);
         Warehouse area = WarehouseFactory.createChild(warehouse, WarehouseTypeEnum.AREA.getType());
         warehouse.addChild(area);
-        WarehouseSpecification.checkWarehouse(warehouse);
         warehouseRepository.putWarehouseIn(area);
         Seller seller = new Seller(storeId, area.getId(), new Date(), new Date());
         sellerRepository.putStoreIn(seller);

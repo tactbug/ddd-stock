@@ -3,6 +3,7 @@ package com.tactbug.ddd.stock.aggregate;
 import com.google.common.base.Objects;
 import com.tactbug.ddd.stock.aggregate.function.IterateChildren;
 import com.tactbug.ddd.stock.aggregate.root.StockRoot;
+import com.tactbug.ddd.stock.aggregate.specification.WarehouseSpecification;
 import com.tactbug.ddd.stock.aggregate.valueObject.WarehouseStatusEnum;
 import com.tactbug.ddd.stock.aggregate.valueObject.WarehouseTypeEnum;
 import com.tactbug.ddd.stock.assist.message.event.EventMessage;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 public class Warehouse {
 
     private Long id;
+
+    //乐观锁控制
     private Integer version;
 
     private String name;
@@ -32,6 +35,7 @@ public class Warehouse {
     private Date createTime;
     private Date updateTime;
 
+    //聚合快照，用来判断聚合是否修改过
     private Warehouse snapshot;
 
     public EventMessage<WarehouseEventTypeEnum, WarehouseCreated> warehouseCreated(){
@@ -52,6 +56,7 @@ public class Warehouse {
         childAdded.setChildTypeInfo(child.getWarehouseType().getMessage());
         childAdded.setChildId(child.getId());
         childAdded.setAddedTime(System.currentTimeMillis());
+        WarehouseSpecification.checkWarehouse(this);
         return new EventMessage<>(child.getId(), WarehouseEventTypeEnum.CHILD_ADDED, childAdded);
     }
 
@@ -71,6 +76,7 @@ public class Warehouse {
         });
         sync(this);
 
+        WarehouseSpecification.checkWarehouse(this);
         return new EventMessage<>(id, WarehouseEventTypeEnum.WAREHOUSE_NAME_UPDATED, warehouseNameUpdated);
     }
 
@@ -112,6 +118,7 @@ public class Warehouse {
         child.setParent(this.id);
         children.add(child);
 
+        WarehouseSpecification.checkWarehouse(this);
         return new EventMessage<>(child.getId(), WarehouseEventTypeEnum.WAREHOUSE_MOVED, warehouseMoved);
     }
 
@@ -129,6 +136,7 @@ public class Warehouse {
         warehouseStatus = WarehouseStatusEnum.ENOUGH;
         sync(this);
 
+        WarehouseSpecification.checkWarehouse(this);
         return new EventMessage<>(id, WarehouseEventTypeEnum.WAREHOUSE_FULL, warehouseStatusUpdated);
     }
 
@@ -153,6 +161,7 @@ public class Warehouse {
         warehouseStatus = WarehouseStatusEnum.OFF;
         sync(this);
 
+        WarehouseSpecification.checkWarehouse(this);
         return new EventMessage<>(id, WarehouseEventTypeEnum.WAREHOUSE_OFF, warehouseStatusUpdated);
     }
 
@@ -171,6 +180,7 @@ public class Warehouse {
         warehouseStatus = WarehouseStatusEnum.ACTIVE;
         sync(this);
 
+        WarehouseSpecification.checkWarehouse(this);
         return new EventMessage<>(id, WarehouseEventTypeEnum.WAREHOUSE_ACTIVE, warehouseStatusUpdated);
     }
 
