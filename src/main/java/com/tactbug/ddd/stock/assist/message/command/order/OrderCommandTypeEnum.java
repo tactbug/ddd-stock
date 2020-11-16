@@ -1,4 +1,4 @@
-package com.tactbug.ddd.stock.assist.message.command.goods;
+package com.tactbug.ddd.stock.assist.message.command.order;
 
 import com.tactbug.ddd.stock.assist.exception.TactStockException;
 import lombok.AllArgsConstructor;
@@ -8,13 +8,13 @@ import java.util.EnumSet;
 
 @AllArgsConstructor
 @Getter
-public enum GoodsCommandTypeEnum {
+public enum OrderCommandTypeEnum {
     OUR_SELLING,
     ;
 
-    public static GoodsCommandTypeEnum getInstance(String type){
-        EnumSet<GoodsCommandTypeEnum> set = EnumSet.allOf(GoodsCommandTypeEnum.class);
-        for (GoodsCommandTypeEnum g :
+    public static OrderCommandTypeEnum getInstance(String type){
+        EnumSet<OrderCommandTypeEnum> set = EnumSet.allOf(OrderCommandTypeEnum.class);
+        for (OrderCommandTypeEnum g :
                 set) {
             if (g.toString().equals(type)){
                 return g;

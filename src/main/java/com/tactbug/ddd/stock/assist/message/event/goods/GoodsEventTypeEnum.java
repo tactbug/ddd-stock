@@ -1,7 +1,6 @@
 package com.tactbug.ddd.stock.assist.message.event.goods;
 
 import com.tactbug.ddd.stock.assist.exception.TactStockException;
-import com.tactbug.ddd.stock.assist.message.command.goods.GoodsCommandTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,7 +9,7 @@ import java.util.EnumSet;
 @AllArgsConstructor
 @Getter
 public enum GoodsEventTypeEnum {
-    SELLER_BAN_GOODS, SELLER_CREATE_GOODS, SELLER_SELLING,
+    SELLER_BAN_GOODS, SELLER_CREATE_GOODS,
     SELLER_UPDATE_QUANTITY,
     ;
 

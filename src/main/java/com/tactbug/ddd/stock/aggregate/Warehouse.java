@@ -131,7 +131,7 @@ public class Warehouse {
         warehouseStatusUpdated.setUpdatedTime(System.currentTimeMillis());
 
         if (stockList.isEmpty()){
-            throw new TactStockException("仓库库存为空");
+            throw new TactStockException("仓库[" + id + "]库存为空");
         }
         warehouseStatus = WarehouseStatusEnum.ENOUGH;
         sync(this);
@@ -149,11 +149,11 @@ public class Warehouse {
         warehouseStatusUpdated.setUpdatedTime(System.currentTimeMillis());
 
         if (!stockList.isEmpty()){
-            throw new TactStockException("仓库里还有库存商品未清空");
+            throw new TactStockException("仓库[" + id + "]还有库存商品未清空");
         }
         iterateChildren(this, (parent, target) -> {
             if (!target.getStockList().isEmpty()){
-                throw new TactStockException("仓库里还有库存商品未清空");
+                throw new TactStockException("仓库[" + target.getId() + "]还有库存商品未清空");
             }
             target.setWarehouseStatus(WarehouseStatusEnum.OFF);
             sync(target);

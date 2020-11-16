@@ -17,26 +17,10 @@ public class StockRepositoryJpaImpl implements StockRepository {
     private StockEntityDao stockEntityDao;
 
     @Override
-    public StockRoot getById(Long goodsId, Long warehouseId, Integer batch) {
-        StockEntity stockEntity = stockEntityDao.findById(new StockId(goodsId, warehouseId, batch))
-                .orElseThrow(() -> new TactStockException("库存商品不存在"));
-        return entityToRoot(stockEntity);
-    }
-
-    @Override
-    public void putStockIn(StockRoot stock) {
-        if (stock.getQuantity() <= 0){
-            stockEntityDao.delete(rootToEntity(stock));
-        }else {
-            stockEntityDao.save(rootToEntity(stock));
-        }
-    }
-
-    @Override
     public void putStockIn(List<StockRoot> stockList) {
         for (StockRoot s :
                 stockList) {
-            if (!s.equals(s.getSnapshot())){
+            if (!s.equals(s.getSnapshot()) || !s.getQuantity().equals(s.getSnapshot().getQuantity())){
                 if (s.getQuantity() <= 0){
                     stockEntityDao.delete(rootToEntity(s));
                 }else {
@@ -44,11 +28,6 @@ public class StockRepositoryJpaImpl implements StockRepository {
                 }
             }
         }
-    }
-
-    @Override
-    public void delete(StockRoot stock) {
-        stockEntityDao.delete(rootToEntity(stock));
     }
 
     @Override

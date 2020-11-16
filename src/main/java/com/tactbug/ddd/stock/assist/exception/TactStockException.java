@@ -1,11 +1,12 @@
 package com.tactbug.ddd.stock.assist.exception;
 
-public class TactStockException extends RuntimeException{
 
-    private final String CODE = "S0101";
+public class TactStockException extends TactException{
+
+    private static final String CODE = "S0101";
 
     public TactStockException(String message){
-        super("库存服务异常: " + message);
+        super(CODE, "库存服务异常: " + message);
     }
 
     @Override
@@ -15,11 +16,4 @@ public class TactStockException extends RuntimeException{
                 ", message: " + this.getMessage() + "}";
     }
 
-    public String code() {
-        return CODE;
-    }
-
-    public String message() {
-        return this.getMessage();
-    }
 }

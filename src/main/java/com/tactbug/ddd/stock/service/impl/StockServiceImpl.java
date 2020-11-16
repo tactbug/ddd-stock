@@ -1,6 +1,5 @@
 package com.tactbug.ddd.stock.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tactbug.ddd.stock.aggregate.Goods;
 import com.tactbug.ddd.stock.aggregate.Seller;
 import com.tactbug.ddd.stock.aggregate.root.StockRoot;
@@ -8,26 +7,22 @@ import com.tactbug.ddd.stock.aggregate.Warehouse;
 import com.tactbug.ddd.stock.aggregate.factory.WarehouseFactory;
 import com.tactbug.ddd.stock.aggregate.valueObject.WarehouseStatusEnum;
 import com.tactbug.ddd.stock.assist.message.command.CallBackMessage;
-import com.tactbug.ddd.stock.assist.message.command.goods.ourSellingGoods.OurSellingCallBack;
+import com.tactbug.ddd.stock.assist.message.command.order.ourSellingGoods.OurSellingCallBack;
 import com.tactbug.ddd.stock.assist.message.event.EventMessage;
 import com.tactbug.ddd.stock.assist.message.event.stock.*;
 import com.tactbug.ddd.stock.assist.exception.TactStockException;
 import com.tactbug.ddd.stock.outbound.publisher.WarehouseEventPublisher;
 import com.tactbug.ddd.stock.outbound.repository.goods.GoodsRepository;
 import com.tactbug.ddd.stock.outbound.repository.seller.SellerRepository;
-import com.tactbug.ddd.stock.outbound.repository.stock.StockRepository;
 import com.tactbug.ddd.stock.outbound.repository.warehouse.WarehouseRepository;
-import com.tactbug.ddd.stock.aggregate.specification.WarehouseSpecification;
 import com.tactbug.ddd.stock.aggregate.valueObject.WarehouseTypeEnum;
 import com.tactbug.ddd.stock.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -35,8 +30,7 @@ public class StockServiceImpl implements StockService {
 
     private static final Integer SELLER_BATCH = 1;
 
-    @Value("${seller.warehouse}")
-    private Long sellerWarehouse;
+    private static final Long SELLER_WAREHOUSE = 100L;
 
     @Autowired
     private WarehouseRepository warehouseRepository;
@@ -51,7 +45,7 @@ public class StockServiceImpl implements StockService {
     private WarehouseEventPublisher warehouseEventPublisher;
 
     @Override
-    public void createWarehouse(String name, Integer type) throws IOException {
+    public void createWarehouse(String name, Integer type) {
         Warehouse warehouse = WarehouseFactory.createTopWarehouse(name, type);
         EventMessage<WarehouseEventTypeEnum, WarehouseCreated> warehouseCreatedEventMessage = warehouse.warehouseCreated();
         warehouseRepository.putWarehouseIn(warehouse);
@@ -59,7 +53,7 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public void addChild(Long parentId, Integer warehouseType) throws JsonProcessingException {
+    public void addChild(Long parentId, Integer warehouseType) {
         Warehouse parent = warehouseRepository.getSimple(parentId);
         warehouseRepository.assembleChildren(parent);
         Warehouse child = WarehouseFactory.createChild(parent, warehouseType);
@@ -69,7 +63,7 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public void updateWarehouseName(Long warehouseId, String newName) throws JsonProcessingException {
+    public void updateWarehouseName(Long warehouseId, String newName) {
         Warehouse warehouse = warehouseRepository.getSimple(warehouseId);
         warehouseRepository.assembleChildren(warehouse);
         EventMessage<WarehouseEventTypeEnum, WarehouseNameUpdated> eventMessage = warehouse.updateName(newName);
@@ -78,7 +72,7 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public void moveWarehouse(Long sourceId, Long targetId) throws JsonProcessingException {
+    public void moveWarehouse(Long sourceId, Long targetId) {
         Warehouse child = warehouseRepository.getSimple(sourceId);
         warehouseRepository.assembleChildren(child);
         Warehouse parent = warehouseRepository.getSimple(targetId);
@@ -89,7 +83,7 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public void makeWarehouseFull(Long warehouseId) throws JsonProcessingException {
+    public void makeWarehouseFull(Long warehouseId) {
         Warehouse warehouse = warehouseRepository.getSimple(warehouseId);
         warehouseRepository.assembleStockList(warehouse);
         EventMessage<WarehouseEventTypeEnum, WarehouseStatusUpdated> eventMessage = warehouse.makeFull();
@@ -98,7 +92,7 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public void deleteWarehouse(Long warehouseId) throws JsonProcessingException {
+    public void deleteWarehouse(Long warehouseId) {
         Warehouse warehouse = warehouseRepository.getSimple(warehouseId);
         warehouseRepository.assembleChildrenAndStockList(warehouse);
 
@@ -121,7 +115,7 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public void makeWarehouseOff(Long warehouseId) throws JsonProcessingException {
+    public void makeWarehouseOff(Long warehouseId) {
         Warehouse warehouse = warehouseRepository.getSimple(warehouseId);
         warehouseRepository.assembleChildrenAndStockList(warehouse);
         EventMessage<WarehouseEventTypeEnum, WarehouseStatusUpdated> eventMessage = warehouse.makeOff();
@@ -130,14 +124,14 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public void makeWarehouseOn(Long warehouseId) throws JsonProcessingException {
+    public void makeWarehouseOn(Long warehouseId) {
         Warehouse target = warehouseRepository.getSimple(warehouseId);
         warehouseRepository.assembleChildren(target);
         List<Warehouse> list = warehouseRepository.parentList(target);
         for (Warehouse p :
                 list) {
             if (p.getWarehouseStatus().equals(WarehouseStatusEnum.OFF)){
-                throw new TactStockException("上级仓库还处于禁用状态");
+                throw new TactStockException("上级仓库[" + warehouseId + "]还处于禁用状态");
             }
         }
         EventMessage<WarehouseEventTypeEnum, WarehouseStatusUpdated> eventMessage = target.makeActive();
@@ -161,7 +155,7 @@ public class StockServiceImpl implements StockService {
     @Override
     public void createStockBySeller(Long sellerId, Long goodsId, Integer quantity) {
         if (!sellerRepository.exists(sellerId)){
-            throw new TactStockException("当前店铺不存在");
+            addAreaBySellerOpeningAShop(sellerId);
         }
         Seller seller = sellerRepository.getById(sellerId);
         Warehouse store = warehouseRepository.getSimple(seller.getAreaId());
@@ -172,28 +166,44 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public void addAreaBySellerOpeningAShop(Long storeId) {
-        Warehouse warehouse = warehouseRepository.getSimple(sellerWarehouse);
+    public void addAreaBySellerOpeningAShop(Long sellerId) {
+        Warehouse warehouse = warehouseRepository.getSimple(SELLER_WAREHOUSE);
         warehouseRepository.assembleChildren(warehouse);
-        Warehouse area = WarehouseFactory.createChild(warehouse, WarehouseTypeEnum.AREA.getType());
-        warehouse.addChild(area);
-        warehouseRepository.putWarehouseIn(area);
-        Seller seller = new Seller(storeId, area.getId(), new Date(), new Date());
-        sellerRepository.putStoreIn(seller);
+
+        if (sellerRepository.exists(sellerId)){
+            Seller seller = sellerRepository.getById(sellerId);
+            Long areaId = seller.getAreaId();
+            List<Warehouse> children = warehouse.getChildren();
+            List<Long> areaIdList = children.stream()
+                    .map(Warehouse::getId)
+                    .collect(Collectors.toList());
+            if (null == seller.getAreaId() || !areaIdList.contains(areaId)){
+                Warehouse area = WarehouseFactory.createChild(warehouse, WarehouseTypeEnum.AREA.getType());
+                warehouse.addChild(area);
+                warehouseRepository.putWarehouseIn(area);
+                seller.setAreaId(area.getId());
+                sellerRepository.putSellerIn(seller);
+            }
+        }else {
+            Warehouse area = WarehouseFactory.createChild(warehouse, WarehouseTypeEnum.AREA.getType());
+            warehouse.addChild(area);
+            warehouseRepository.putWarehouseIn(area);
+            Seller seller = new Seller(sellerId, area.getId());
+            sellerRepository.putSellerIn(seller);
+        }
+
     }
 
     @Override
     public void getStockOutBySellerSelling(Long goodsId, Integer quantity) {
         Goods goods = goodsRepository.getById(goodsId);
         goods.sellerSelling(quantity);
-        goods.checkGoodsStock();
         goodsRepository.putGoodsIn(goods);
     }
 
     @Override
     public void banStockBySeller(Long goodsId) {
         Goods goods = goodsRepository.getById(goodsId);
-        goods.checkGoodsStock();
         goodsRepository.delete(goods);
     }
 
@@ -208,22 +218,27 @@ public class StockServiceImpl implements StockService {
     public CallBackMessage<OurSellingCallBack> getStockOutByOurSelling(Long goodsId, Integer quantity) {
         Goods goods = goodsRepository.getById(goodsId);
         CallBackMessage<OurSellingCallBack> callBackMessage = goods.selfSelling(quantity);
-        goods.checkGoodsStock();
         goodsRepository.putGoodsIn(goods);
         return callBackMessage;
     }
 
     @Override
-    public void updateStockQuantityBySeller(Long goodsId, Integer quantity) {
-        Goods goods = goodsRepository.getById(goodsId);
-        goods.sellerSetQuantity(quantity);
-        goods.checkGoodsStock();
-        goodsRepository.putGoodsIn(goods);
+    public void updateStockQuantityBySeller(Long sellerId, Long goodsId, Integer quantity) {
+        if (goodsRepository.exists(goodsId)){
+            Goods goods = goodsRepository.getById(goodsId);
+            goods.sellerSetQuantity(quantity);
+            goodsRepository.putGoodsIn(goods);
+        }else {
+            createStockBySeller(sellerId, goodsId, quantity);
+        }
+
     }
 
     @Override
     public void sellerCloseStore(Long sellerId) {
-        Seller seller = sellerRepository.getById(sellerId);
-        sellerRepository.delete(seller);
+        if (sellerRepository.exists(sellerId)){
+            Seller seller = sellerRepository.getById(sellerId);
+            sellerRepository.delete(seller);
+        }
     }
 }

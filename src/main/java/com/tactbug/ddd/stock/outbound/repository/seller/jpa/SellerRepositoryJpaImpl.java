@@ -37,7 +37,7 @@ public class SellerRepositoryJpaImpl implements SellerRepository {
     }
 
     @Override
-    public void putStoreIn(Seller seller) {
+    public void putSellerIn(Seller seller) {
         if (null == seller.getAreaId()){
             sellerEntityDao.delete(aggregateToEntity(seller));
         }else {
@@ -47,13 +47,12 @@ public class SellerRepositoryJpaImpl implements SellerRepository {
 
     @Override
     public void delete(Seller seller) {
-        Warehouse area = warehouseRepository.getSimple(seller.getAreaId());
-        if (!area.getParent().equals(sellerWarehouse)){
-            throw new TactStockException("卖家区域位置错误");
+        if (warehouseRepository.exists(seller.getAreaId())){
+            Warehouse area = warehouseRepository.getSimple(seller.getAreaId());
+            warehouseRepository.assembleStockList(area);
+            stockRepository.delete(area.getStockList());
+            warehouseRepository.delete(area);
         }
-        warehouseRepository.assembleStockList(area);
-        stockRepository.delete(area.getStockList());
-        warehouseRepository.delete(area);
         sellerEntityDao.delete(aggregateToEntity(seller));
     }
 

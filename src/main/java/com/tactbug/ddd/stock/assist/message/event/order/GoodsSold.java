@@ -1,4 +1,4 @@
-package com.tactbug.ddd.stock.assist.message.event.goods;
+package com.tactbug.ddd.stock.assist.message.event.order;
 
 import lombok.Data;
 

@@ -5,6 +5,6 @@ import com.tactbug.ddd.stock.aggregate.Seller;
 public interface SellerRepository {
     boolean exists(Long id);
     Seller getById(Long id);
-    void putStoreIn(Seller seller);
+    void putSellerIn(Seller seller);
     void delete(Seller seller);
 }

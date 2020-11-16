@@ -1,6 +1,5 @@
 package com.tactbug.ddd.stock.aggregate;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,7 +7,6 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Seller {
 
     private Long id;
@@ -17,9 +15,10 @@ public class Seller {
     private Date createTime;
     private Date updateTime;
 
-    public void addArea(Long areaId){
+    public Seller(Long id, Long areaId){
+        this.id = id;
         this.areaId = areaId;
+        this.createTime = new Date();
         this.updateTime = new Date();
     }
-
 }

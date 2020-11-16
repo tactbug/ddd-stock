@@ -52,8 +52,10 @@ public class GoodsRepositoryJpaImpl implements GoodsRepository {
 
     @Override
     public void delete(Goods goods) {
-        stockRepository.delete(goods.getStocks());
-        goodsEntityDao.delete(aggregateToEntity(goods));
+        if (goodsEntityDao.existsById(goods.getId())){
+            stockRepository.delete(goods.getStocks());
+            goodsEntityDao.delete(aggregateToEntity(goods));
+        }
     }
 
     private Goods entityToAggregate(GoodsEntity goodsEntity){

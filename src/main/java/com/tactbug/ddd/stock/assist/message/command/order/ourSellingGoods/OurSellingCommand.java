@@ -1,4 +1,4 @@
-package com.tactbug.ddd.stock.assist.message.command.goods.ourSellingGoods;
+package com.tactbug.ddd.stock.assist.message.command.order.ourSellingGoods;
 
 import lombok.Data;
 

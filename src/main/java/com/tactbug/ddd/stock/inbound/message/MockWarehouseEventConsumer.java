@@ -1,6 +1,5 @@
 package com.tactbug.ddd.stock.inbound.message;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.tactbug.ddd.stock.assist.message.event.EventMessage;
 import com.tactbug.ddd.stock.assist.message.event.stock.*;
@@ -17,7 +16,7 @@ public class MockWarehouseEventConsumer {
     public void onWarehouseEvent(
             String data,
             @Header(name = KafkaHeaders.RECEIVED_MESSAGE_KEY) String messageKey
-    ) throws JsonProcessingException {
+    ) {
         WarehouseEventTypeEnum warehouseType = WarehouseEventTypeEnum.getWarehouseType(messageKey);
         switch (warehouseType){
             case WAREHOUSE_CREATED:{
@@ -50,56 +49,56 @@ public class MockWarehouseEventConsumer {
         }
     }
 
-    private void onWarehouseCreated(String data) throws JsonProcessingException {
+    private void onWarehouseCreated(String data) {
         EventMessage<WarehouseEventTypeEnum, WarehouseCreated> warehouseCreated =
                 JacksonUtil.stringToObject(data, new TypeReference<EventMessage<WarehouseEventTypeEnum, WarehouseCreated>>() {});
         System.out.println("接收到仓库创建事件广播: ");
         System.out.println(warehouseCreated);
     }
 
-    private void onChildAdded(String data) throws JsonProcessingException {
+    private void onChildAdded(String data) {
         EventMessage<WarehouseEventTypeEnum, ChildAdded> warehouseCreated =
                 JacksonUtil.stringToObject(data, new TypeReference<EventMessage<WarehouseEventTypeEnum, ChildAdded>>() {});
         System.out.println("接收到仓库添加子仓库事件广播: ");
         System.out.println(warehouseCreated);
     }
 
-    private void onWarehouseNameUpdated(String data) throws JsonProcessingException {
+    private void onWarehouseNameUpdated(String data) {
         EventMessage<WarehouseEventTypeEnum, WarehouseNameUpdated> warehouseNameUpdated =
                 JacksonUtil.stringToObject(data, new TypeReference<EventMessage<WarehouseEventTypeEnum, WarehouseNameUpdated>>() {});
         System.out.println("接收到仓库名称修改事件广播: ");
         System.out.println(warehouseNameUpdated);
     }
 
-    private void onWarehouseMoved(String data) throws JsonProcessingException {
+    private void onWarehouseMoved(String data) {
         EventMessage<WarehouseEventTypeEnum, WarehouseMoved> warehouseMoved =
                 JacksonUtil.stringToObject(data, new TypeReference<EventMessage<WarehouseEventTypeEnum, WarehouseMoved>>() {});
         System.out.println("接收到仓库移动事件广播: ");
         System.out.println(warehouseMoved);
     }
 
-    private void onWarehouseFull(String data) throws JsonProcessingException {
+    private void onWarehouseFull(String data) {
         EventMessage<WarehouseEventTypeEnum, WarehouseStatusUpdated> warehouseStatusUpdated =
                 JacksonUtil.stringToObject(data, new TypeReference<EventMessage<WarehouseEventTypeEnum, WarehouseStatusUpdated>>() {});
         System.out.println("接收到仓库满载事件广播: ");
         System.out.println(warehouseStatusUpdated);
     }
 
-    private void onWarehouseOff(String data) throws JsonProcessingException {
+    private void onWarehouseOff(String data) {
         EventMessage<WarehouseEventTypeEnum, WarehouseStatusUpdated> warehouseStatusUpdated =
                 JacksonUtil.stringToObject(data, new TypeReference<EventMessage<WarehouseEventTypeEnum, WarehouseStatusUpdated>>() {});
         System.out.println("接收到仓库禁用事件广播: ");
         System.out.println(warehouseStatusUpdated);
     }
 
-    private void onWarehouseActive(String data) throws JsonProcessingException {
+    private void onWarehouseActive(String data) {
         EventMessage<WarehouseEventTypeEnum, WarehouseStatusUpdated> warehouseStatusUpdated =
                 JacksonUtil.stringToObject(data, new TypeReference<EventMessage<WarehouseEventTypeEnum, WarehouseStatusUpdated>>() {});
         System.out.println("接收到仓库启用事件广播: ");
         System.out.println(warehouseStatusUpdated);
     }
 
-    private void onWarehouseDeleted(String data) throws JsonProcessingException {
+    private void onWarehouseDeleted(String data) {
         EventMessage<WarehouseEventTypeEnum, WarehouseDeleted> warehouseDeleted =
                 JacksonUtil.stringToObject(data, new TypeReference<EventMessage<WarehouseEventTypeEnum, WarehouseDeleted>>() {});
         System.out.println("接收到仓库删除事件广播: ");

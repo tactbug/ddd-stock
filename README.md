@@ -1,4 +1,6 @@
 # ddd-stock
+## 注：此项目已作为微服务项目并入<a href="https://github.com/tactbug/ddd-mall">ddd-mall</a>, 当前项目停止维护
+---
 采用领域驱动设计(ddd)完成的一个模拟B/C2C的电商项目，这是模拟其中的库存管理服务端
 
 ## 项目简介

@@ -36,12 +36,11 @@ public class StockRoot {
         StockRoot stock = (StockRoot) o;
         return Objects.equal(goodsId, stock.goodsId) &&
                 Objects.equal(warehouseId, stock.warehouseId) &&
-                Objects.equal(batch, stock.batch) &&
-                Objects.equal(quantity, stock.quantity);
+                Objects.equal(batch, stock.batch);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(goodsId, warehouseId, batch, quantity);
+        return Objects.hashCode(goodsId, warehouseId, batch);
     }
 }

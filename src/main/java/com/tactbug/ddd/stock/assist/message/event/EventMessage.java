@@ -1,14 +1,23 @@
 package com.tactbug.ddd.stock.assist.message.event;
 
-import lombok.AllArgsConstructor;
+import com.tactbug.ddd.stock.assist.utils.CodeUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class EventMessage<T, E> {
+
+    private Long messageId;
     private Object aggregateId;
     private T eventType;
     private E event;
+
+    public EventMessage(Object aggregateId, T eventType, E event){
+        messageId = CodeUtil.nextId();
+        this.aggregateId = aggregateId;
+        this.eventType = eventType;
+        this.event = event;
+    }
+
 }

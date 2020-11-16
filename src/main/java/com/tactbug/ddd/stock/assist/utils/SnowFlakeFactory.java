@@ -5,22 +5,22 @@ public class SnowFlakeFactory {
      * ID中41位时间戳的起点 (2020-01-01 00:00:00.00)
      * @apiNote 一般地，选用系统上线的时间
      */
-    private final long startPoint = 1577808000000L;
+    private static final long startPoint = 1577808000000L;
 
     /**
      * 序列号位数
      */
-    private final long sequenceBits = 12L;
+    private static final long sequenceBits = 12L;
 
     /**
      * 机器ID位数
      */
-    private final long workerIdBits = 5L;
+    private static final long workerIdBits = 5L;
 
     /**
      * 数据中心ID位数
      */
-    private final long dataCenterIdBits = 5L;
+    private static final long dataCenterIdBits = 5L;
 
     /**
      * 序列号最大值, 4095

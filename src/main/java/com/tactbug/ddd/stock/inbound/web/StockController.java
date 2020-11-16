@@ -1,15 +1,12 @@
 package com.tactbug.ddd.stock.inbound.web;
 
-import com.tactbug.ddd.stock.aggregate.valueObject.WarehouseStatusEnum;
 import com.tactbug.ddd.stock.assist.exception.TactStockException;
 import com.tactbug.ddd.stock.service.StockService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 
 @Api(tags = "仓库管理系统controller")
 @RestController
@@ -20,31 +17,31 @@ public class StockController {
 
     @ApiOperation(value = "添加顶级仓库")
     @PostMapping("/stock/warehouse")
-    public void createWarehouse(String name, Integer type) throws IOException {
+    public void createWarehouse(String name, Integer type) {
         stockService.createWarehouse(name, type);
     }
 
     @ApiOperation(value = "添加子仓库")
     @PostMapping("/stock/warehouse/child")
-    public void addChildWarehouse(Long parentId, Integer type) throws IOException {
+    public void addChildWarehouse(Long parentId, Integer type) {
         stockService.addChild(parentId, type);
     }
 
     @ApiOperation(value = "修改仓库名称")
     @PutMapping("/stock/warehouse/name")
-    public void updateWarehouseName(Long warehouseId, String name) throws IOException {
+    public void updateWarehouseName(Long warehouseId, String name) {
         stockService.updateWarehouseName(warehouseId, name);
     }
 
     @ApiOperation(value = "移动仓库")
     @PutMapping("/stock/warehouse")
-    public void moveWarehouse(Long sourceId, Long targetId) throws IOException {
+    public void moveWarehouse(Long sourceId, Long targetId) {
         stockService.moveWarehouse(sourceId, targetId);
     }
 
-    @ApiOperation(value = "设置仓库状态(1、启用, 2、满载, 0、禁用)")
+    @ApiOperation(value = "设置仓库状态(0、禁用, 1、启用, 2、满载)")
     @PutMapping("/stock/warehouse/status")
-    public void updateWarehouseStatus(Long warehouseId, Integer status) throws IOException {
+    public void updateWarehouseStatus(Long warehouseId, Integer status) {
         switch (status){
             case 0:{
                 stockService.makeWarehouseOff(warehouseId);
@@ -65,7 +62,7 @@ public class StockController {
 
     @ApiOperation(value = "删除仓库")
     @DeleteMapping("/stock/warehouse")
-    public void deleteWarehouse(Long warehouseId) throws IOException {
+    public void deleteWarehouse(Long warehouseId) {
         stockService.deleteWarehouse(warehouseId);
     }
 
